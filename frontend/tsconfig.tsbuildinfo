@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/format.ts","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/api/client.ts","./src/components/registerdeviceform.tsx","./src/components/statusbadge.tsx","./src/components/submitreportform.tsx","./src/pages/devicedetailpage.tsx","./src/pages/devicespage.tsx"],"version":"5.9.3"}

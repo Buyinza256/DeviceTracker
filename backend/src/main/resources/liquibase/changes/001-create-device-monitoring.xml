@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-devices" author="bcs">
+        <createTable tableName="devices">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hostname" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="registered_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Hostnames identify a device on the network, so they must be unique. -->
+        <addUniqueConstraint tableName="devices" columnNames="hostname" constraintName="uq_devices_hostname"/>
+    </changeSet>
+
+    <changeSet id="002-create-status-reports" author="bcs">
+        <createTable tableName="status_reports">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="device_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="VARCHAR(1000)"/>
+            <column name="reported_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="status_reports" baseColumnNames="device_id"
+                                 constraintName="fk_status_reports_device"
+                                 referencedTableName="devices" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <!-- Supports "20 most recent reports for a device" and latest-per-device lookups. -->
+        <createIndex tableName="status_reports" indexName="idx_status_reports_device_reported_at">
+            <column name="device_id"/>
+            <column name="reported_at" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
